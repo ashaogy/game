@@ -57,7 +57,7 @@ class Game:
     @property
     def play_movie(self):
 
-        filename = 'intro.avi'
+        filename = 'intro.mp4'
 
         cap = cv2.VideoCapture(filename)
 
