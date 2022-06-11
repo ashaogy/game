@@ -12,7 +12,7 @@ class Button():
             active_color=BLACK,
             size=24,
             font='Montserrat',
-            padding=5
+            padding=4
     ):
         # Текущее состояние кнопки. Все состояния: 'normal', 'highlight', 'active'
         self.state = 'normal'
@@ -204,7 +204,7 @@ class TimerLabel:
 
 
 """ Класс TopPanel отвечает за отрисовку верхней панели
-   в ерхней панели должны отображаться:
+   в Vерхней панели должны отображаться:
  - количество собранных в игре ягод (картинка ягода + число)
  - количество жизней игрока (картинка сердечка + число)
  - таймер
@@ -225,32 +225,32 @@ class TopPanel():
         # Пиктограмма сердечка:
         self.lives_img = pygame.image.load('heart.png').convert_alpha()
         self.lives_img_rect = self.lives_img.get_rect()
-        self.lives_img_rect.y = y
+        self.lives_img_rect.y = y - 5
         self.lives_img_rect.x = x
 
         # Надпись для кол-ва собранных ягод:
-        self.coin_label = FONT.render('0', True, WHITE)
-        self.coin_rect = self.coin_label.get_rect()
-        self.coin_rect.x = x + 140
-        self.coin_rect.y = y
+        self.berry_label = FONT.render('0', True, WHITE)
+        self.berry_rect = self.berry_label.get_rect()
+        self.berry_rect.x = x + 140
+        self.berry_rect.y = y
 
         # Пиктограмма ягода:
-        self.coin_img = pygame.image.load('berry.png').convert_alpha()
-        self.coin_img_rect = self.coin_img.get_rect()
-        self.coin_img_rect.y = y - 10
-        self.coin_img_rect.x = x + 100
+        self.berry_img = pygame.image.load('berry.png').convert_alpha()
+        self.berry_img_rect = self.berry_img.get_rect()
+        self.berry_img_rect.y = y - 10
+        self.berry_img_rect.x = x + 100
 
         # таймер
         self.timer = TimerLabel(x + 200, y)
 
-    def update(self, lives=3, coin=0):
+    def update(self, lives=3, berry=0):
         self.lives_label = FONT.render(str(lives), True, WHITE)
-        self.coin_label = FONT.render(str(coin), True, WHITE)
+        self.berry_label = FONT.render(str(berry), True, WHITE)
         self.timer.update()
 
     def draw(self, screen):
         screen.blit(self.lives_label, self.lives_rect)
         screen.blit(self.lives_img, self.lives_img_rect)
-        screen.blit(self.coin_label, self.coin_rect)
-        screen.blit(self.coin_img, self.coin_img_rect)
+        screen.blit(self.berry_label, self.berry_rect)
+        screen.blit(self.berry_img, self.berry_img_rect)
         self.timer.draw(screen)
