@@ -6,12 +6,8 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, x, y, img='noname girl.png'):
         super().__init__()
-        self.sprites = []
-        self.sprites.append(pygame.image.load('noname girl.png'))
-        self.sprites.append(pygame.image.load('heart.png'))
         self.current_sprite = 0
-        self.image = self.sprites[self.current_sprite]
-
+        self.image = pygame.image.load(img).convert_alpha()
         # Положение спрайта игрока на экране
         self.rect = self.image.get_rect()
         self.rect.y = y
@@ -132,7 +128,7 @@ class Enemy(pygame.sprite.Sprite):
         self.start = x
         self.stop = x
         self.direction = 1
-        self.speed = 2
+        self.speeds = speed
 
     def shift(self, x):
         self.rect.x += x
@@ -146,4 +142,4 @@ class Enemy(pygame.sprite.Sprite):
         if self.rect.x <= self.start:
             self.rect.x = self.start
             self.direction = 1
-        self.rect.x += self.direction * self.speed
+        self.rect.x += self.direction * self.speeds
