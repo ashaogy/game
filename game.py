@@ -14,7 +14,7 @@ class Game:
         self.all_sprite_list = pygame.sprite.Group()
 
         # Скорость движения врага
-        self.speed = 1.6
+        self.speed = 2
 
         # Платформы
         self.platform_list = pygame.sprite.Group()
@@ -28,7 +28,7 @@ class Game:
         self.enemy_list = pygame.sprite.Group()
         self.create_enemies()
 
-        # Спрайт игрока
+        # Girl
         self.player = game_object.Player(0, 0)
         self.player.platforms = self.platform_list
         self.player.artifacts = self.artifact_list
@@ -37,8 +37,10 @@ class Game:
         # MainMenu
         self.top_panel = TopPanel(20, 10)
         self.main_menu = MainMenu(300, 200)
+
         # Меню Settings
         self.settings_menu = SettingsMenu(300, 200)
+
         # Смещение игрового мира:
         self.shift = 0
         self.player_global_x = self.player.rect.x
@@ -46,7 +48,6 @@ class Game:
 
         self.clock = pygame.time.Clock()
         self.time = 0
-        # необходимо, чтобы игрок не получал урон от противника больше чем 1 за сек
         self.hit_time = 0
 
         # Игровые сцены state: 'START', MENU', 'SETTINGS', 'GAME', 'PAUSE' ' 'FINISH', 'GAME_OVER'
@@ -56,7 +57,7 @@ class Game:
     @property
     def play_movie(self):
 
-        filename = 'intro.mp4'
+        filename = 'intro.avi'
 
         cap = cv2.VideoCapture(filename)
 
@@ -85,18 +86,13 @@ class Game:
                     running = False
                     pygame.quit()
                 if event.type == pygame.KEYDOWN:
-                    # Нажатие ESC - завершить и вернуться в сотсояние START
                     if event.key == pygame.K_SPACE:
                         running = False
                         self.state = "START"
-
-            # захватываем и получаем следующий кадр:
             ret, img = cap.read()
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
             if not ret:
                 running = False
-
                 break
             else:
                 # изменяем изображение под размер формы
@@ -105,22 +101,22 @@ class Game:
                 img = cv2.transpose(img)
                 pygame.surfarray.blit_array(surface, img)
                 self.screen.blit(surface, (0, 0))
-
             pygame.display.flip()
             clock.tick(FPS)
-        # Когда завершился основной цикл, останавливаем музыку:
         if running == False:
             self.music.stop()
 
     # Создаем стены и платформы
     def create_walls(self):
         platform_coords = [
-            [200, 450],
-            [200, 500],
+            [100, 600],
             [200, 550],
+            [250, 550],
+            [300, 450],
             [300, 500],
             [300, 550],
-            [400, 450],
+            [300, 500],
+            [300, 550],
             [450, 450],
             [550, 350],
             [600, 350],
@@ -150,9 +146,12 @@ class Game:
     # Создаем артефакты (ягоды) в игре
     def create_artifacts(self):
         artifact_coords = [
-            [200, 250],
-            [200, 300],
-            [200, 350],
+            [150, 450],
+            [200, 450],
+            [350, 450],
+            [300, 250],
+            [300, 300],
+            [300, 350],
             [200, 400],
             [450, 400],
             [600, 200],
@@ -183,7 +182,8 @@ class Game:
     def create_enemies(self):
 
         enemies_coords = [
-            [0, 300, 400],
+            [1200, 200, 1600],
+            [100, 300, 400],
             [450, 500, 800],
             [1200, 500, 1600]
         ]
@@ -229,7 +229,6 @@ class Game:
 
         # Обрабатотка события меню настроек:
         elif self.state == 'SETTINGS':
-            # Получаем кнопку, на которую нажали в меню настроек:
             active_button = self.settings_menu.handle_mouse_event(event.type)
             if active_button:
                 if active_button.name in ['OK', 'CANCEL']:
@@ -244,12 +243,18 @@ class Game:
                     # Нажали на кнопку FAST, меняем скорость движения врагов:
                     if active_button.name == 'FAST':
                         self.speed = 10
+                        active_button.state = 'active'
+
                     # Нажали на кнопку MEDIUM, меняем скорость движения врагов:
                     elif active_button.name == 'MEDIUM':
                         self.speed = 5
+                        active_button.state = 'active'
+
                     # Нажали на кнопку SLOW, меняем скорость движения врагов:
                     elif active_button.name == 'SLOW':
-                        self.speed = 2
+                        self.speed = 1
+                        active_button.state = 'active'
+
 
         # Обработка событий, когда идет игра
         elif self.state == 'GAME':
@@ -294,8 +299,14 @@ class Game:
             # фон
             self.screen.blit(pygame.image.load("background.png").convert(), [0, 0])
             # надпись
+
             self.label = FONT.render('YOU WIN!', True, GREEN)
-            self.screen.blit(self.label, [WIN_WIDTH / 2.3, WIN_HEIGHT // 1.3])
+            self.screen.blit(self.label, [WIN_WIDTH / 2.3, WIN_HEIGHT // 1.5])
+            self.label = FONT.render('BERRIES SCORE: ', True, BLACK)
+            self.screen.blit(self.label, [WIN_WIDTH / 2.9, WIN_HEIGHT // 1.3])
+            self.label = FONT.render(str(self.player.score), True, RED)
+            self.screen.blit(self.label, [WIN_WIDTH / 1.5, WIN_HEIGHT // 1.3])
+
         elif self.state == 'GAME OVER':
             # фон
             self.screen.blit(pygame.image.load("background.png").convert(), [0, 0])
@@ -308,7 +319,7 @@ class Game:
         if self.state == 'GAME':
             self.time += 1
             self.all_sprite_list.update()
-            self.top_panel.update(coin=self.player.score, lives=self.player.lives)
+            self.top_panel.update(berry=self.player.score, lives=self.player.lives)
 
             # Проверка стокновения игрока с противником:
             if pygame.sprite.spritecollideany(self.player, self.enemy_list):
@@ -338,13 +349,13 @@ class Game:
                     done = True
                 self.handle_states(event)
 
-            # Если игрок приближается к правому краю экрана, смещаем мир влево на (-x)
+            # Если игрок приближается к правому краю экрана, мир смещается влево
             if self.player.rect.right >= 500 and abs(self.shift) < self.game_width - WIN_WIDTH:
                 diff = self.player.rect.right - 500
                 self.player.rect.right = 500
                 self.shift_world(-diff)
 
-            # Если игрок приближается к левому краю экрана, смещаем мир вправо на (+x)
+            # Если игрок приближается к левому краю экрана, мир смещается вправо
             if self.player.rect.left <= 120 and abs(self.shift) > 0:
                 diff = 120 - self.player.rect.left
                 self.player.rect.left = 120
